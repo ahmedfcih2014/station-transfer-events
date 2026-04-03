@@ -12,3 +12,4 @@ This repository to demonstrate a simple task as a hiring step in PetroApp compan
    - We implement this with a **database unique constraint on `event_id` plus transactional inserts**—one of the approaches the brief allows.
    - Duplicates surface as constraint violations inside the transaction, so we never persist two rows for the same event and downstream totals remain aligned with stored events
    - This keeps the system state consistent and will fail fast in the application layer without persist the data at the database.
+3. Will use a database storage like `mysql`/`postgres` both support ACID both has a powerful features for scaling up the system.
