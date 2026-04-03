@@ -2,7 +2,64 @@
 
 This repository to demonstrate a simple task as a hiring step in PetroApp company
 
-## Decisions
+## API Examples
+
+Examples assume the HTTP server is at `http://localhost:8080` (adjust host and port to match how you run the app).
+
+### 1. Store transfers — `POST /transfers`
+
+Batch ingest of transfer events (idempotent by `event_id`; see [assignment](artifacts/assignment.md#accept-a-json-body)).
+
+**Request**
+
+```bash
+curl -sS -X POST 'http://localhost:8080/transfers' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "events": [
+      {
+        "event_id": "evt-001",
+        "station_id": "S1",
+        "amount": 100.5,
+        "status": "approved",
+        "created_at": "2026-02-19T10:00:00Z"
+      }
+    ]
+  }'
+```
+
+**Response** `200 OK` — [documented return shape](artifacts/assignment.md#return):
+
+```json
+{
+  "inserted": 7,
+  "duplicates": 3
+}
+```
+
+Invalid or failing validation → **`400`** with a helpful error ([error handling](artifacts/assignment.md#error-handling)).
+
+### 2. Summarize station transfers — `GET /stations/{station_id}/summary`
+
+**Request**
+
+```bash
+curl -sS 'http://localhost:8080/stations/S1/summary'
+```
+
+**Response** `200 OK` — [documented return shape](artifacts/assignment.md#return-1):
+
+```json
+{
+  "station_id": "S1",
+  "total_approved_amount": 450.25,
+  "events_count": 12
+}
+```
+
+---
+
+## Design Notes
 
 1. **Batch handling:** we use **fail-fast**—if the payload shape is invalid or any event fails [validation](artifacts/assignment.md#validation-expectations), we reject the **entire** batch (no partial accept), as allowed in the [assignment error-handling notes](artifacts/assignment.md#error-handling). The API returns **400** with a helpful error so callers know what to fix before retrying.
    - Fail-fast keeps server behavior and stored data easy to reason about and to extend later (no mixed “some rows saved” states for the same request).
