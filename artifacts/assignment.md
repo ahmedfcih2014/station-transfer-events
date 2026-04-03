@@ -46,7 +46,7 @@ TransferEvent
     - If an event with the same event_id already exists, do not store/overwrite it.
   - Must be concurrency-safe:
     - Concurrent requests containing overlapping event_id s must not double insert.
-  - Return:
+- Return:
 
   ```
   {
@@ -55,29 +55,32 @@ TransferEvent
   }
   ```
 
-  - Validation expectations:
-    - event_id , station_id , status , created_at are required.
-    - amount must be a non-negative number.
-    - created_at must be parseable as ISO8601.
-    - Unknown statuses are allowed but do not count unless "approved" .
-  - Error handling:
-    - If the payload shape is invalid → 400 with a helpful error.
-    - You may choose “fail-fast” (reject whole batch) or “partial accept”; document your choice in README.
+- Validation expectations:
+  - event_id , station_id , status , created_at are required.
+  - amount must be a non-negative number.
+  - created_at must be parseable as ISO8601.
+  - Unknown statuses are allowed but do not count unless "approved" .
+- Error handling:
+  - If the payload shape is invalid → 400 with a helpful error.
+  - You may choose “fail-fast” (reject whole batch) or “partial accept”; document your choice in README.
+
+---
 
 2. GET /stations/{station\*id}/summary
-   - Return:
 
-   ```
-   {
-    "station_id": "S1",
-    "total_approved_amount": 450.25,
-    "events_count": 12
-   }
-   ```
+- Return:
 
-   - Rules:
-     - events_count = count of stored events for that station (all statuses), unless you choose “approved only”; again, document your decision.
-     - Totals must only sum approved events.
+  ```
+  {
+   "station_id": "S1",
+   "total_approved_amount": 450.25,
+   "events_count": 12
+  }
+  ```
+
+- Rules:
+  - events_count = count of stored events for that station (all statuses), unless you choose “approved only”; again, document your decision.
+  - Totals must only sum approved events.
 
 ---
 
