@@ -13,3 +13,7 @@ This repository to demonstrate a simple task as a hiring step in PetroApp compan
    - Duplicates surface as constraint violations inside the transaction, so we never persist two rows for the same event and downstream totals remain aligned with stored events
    - This keeps the system state consistent and will fail fast in the application layer without persist the data at the database.
 3. Will use a database storage like `mysql`/`postgres` both support ACID both has a powerful features for scaling up the system.
+4. **Summaries and what we persist:** the [GET summary rules](artifacts/assignment.md#rules-1) require `total_approved_amount` to sum **only** `approved` events.
+   - For `events_count`, the brief allows either all stored rows per station or approved-only; **we count only stored rows**, and because we **persist only `approved` events**, `events_count` matches approved events for that station.
+   - Ingest accepts other statuses for validation, but **non-approved events are not stored**—they do not affect totals or counts—so we never need to change a row’s status later.
+   - There is **no update API** for events; POST remains idempotent on `event_id` (no overwrite), which fits “write once” approved-only storage.
