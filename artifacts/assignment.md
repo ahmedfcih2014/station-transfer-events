@@ -68,7 +68,7 @@ TransferEvent
 
 2. GET /stations/{station\*id}/summary
 
-- Return:
+- ### Return:
 
   ```
   {
@@ -78,7 +78,7 @@ TransferEvent
   }
   ```
 
-- Rules:
+- ### Rules:
   - events_count = count of stored events for that station (all statuses), unless you choose “approved only”; again, document your decision.
   - Totals must only sum approved events.
 
