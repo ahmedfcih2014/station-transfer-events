@@ -25,7 +25,7 @@ TransferEvent
 
 1. POST /transfers
 
-- Accept a JSON, body:
+- ### Accept a JSON, body:
 
   ```
    {
@@ -41,12 +41,12 @@ TransferEvent
    }
   ```
 
-- Behavior:
+- ### Behavior:
   - Must be idempotent by event_id :
     - If an event with the same event_id already exists, do not store/overwrite it.
   - Must be concurrency-safe:
     - Concurrent requests containing overlapping event_id s must not double insert.
-- Return:
+- ### Return:
 
   ```
   {
@@ -55,12 +55,12 @@ TransferEvent
   }
   ```
 
-- Validation expectations:
+- ### Validation expectations:
   - event_id , station_id , status , created_at are required.
   - amount must be a non-negative number.
   - created_at must be parseable as ISO8601.
   - Unknown statuses are allowed but do not count unless "approved" .
-- Error handling:
+- ### Error handling:
   - If the payload shape is invalid → 400 with a helpful error.
   - You may choose “fail-fast” (reject whole batch) or “partial accept”; document your choice in README.
 
