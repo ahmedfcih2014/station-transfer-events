@@ -17,3 +17,4 @@ This repository to demonstrate a simple task as a hiring step in PetroApp compan
    - For `events_count`, the brief allows either all stored rows per station or approved-only; **we count only stored rows**, and because we **persist only `approved` events**, `events_count` matches approved events for that station.
    - Ingest accepts other statuses for validation, but **non-approved events are not stored**—they do not affect totals or counts—so we never need to change a row’s status later.
    - There is **no update API** for events; POST remains idempotent on `event_id` (no overwrite), which fits “write once” approved-only storage.
+5. **Idempotency** as mentioned in point 2 above, I'll handle the Idempotency depending on the DB unique constraint plus transaction inserts by using `INSERT OR IGNORE` / `ON CONFLICT DO NOTHING` depends on our final database storage decision.
