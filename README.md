@@ -8,6 +8,8 @@ This repository to demonstrate a simple task as a hiring step in PetroApp compan
 - **PostgreSQL** provides ACID transactions and unique constraints on `event_id` for concurrency-safe idempotent inserts; it is heavier to run than SQLite or an in-memory store but closer to how we’d operate this in production.
 - **Nginx + PHP-FPM** matches a typical deploy layout; for local development, `php artisan serve` is enough with less setup at the cost of parity with prod.
 
+## [Requirements](artifacts/assignment.md)
+
 ## API Examples
 
 Examples assume the HTTP server is at `http://localhost:8080` (adjust host and port to match how you run the app).
