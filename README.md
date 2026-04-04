@@ -87,4 +87,9 @@ curl -sS 'http://localhost:8000/api/stations/S1/summary'
    - For `events_count`, the brief allows either all stored rows per station or approved-only; **we count only stored rows**, and because we **persist only `approved` events**, `events_count` matches approved events for that station.
    - Ingest accepts other statuses for validation, but **non-approved events are not stored**—they do not affect totals or counts—so we never need to change a row’s status later.
    - There is **no update API** for events; POST remains idempotent on `event_id` (no overwrite), which fits “write once” approved-only storage.
-5. **Idempotency** as mentioned in point 2 above, I'll handle the Idempotency depending on the DB unique constraint plus transaction inserts by using `INSERT OR IGNORE` / `ON CONFLICT DO NOTHING` depends on our final database storage decision.
+5. **POST response counts (`inserted` / `duplicates`) for mixed batches:** validation applies to **every** event in the batch, but only **`approved`** events are written. Counters refer to that write path only:
+   - **`inserted`** — how many **approved** events became new rows in this request (after `ON CONFLICT` / existing-key handling).
+   - **`duplicates`** — duplicate `event_id` values **among approved events in the same request**, plus approved `event_id`s that **already existed** in the store (idempotent replay).
+   - **Non-approved** events (any status other than `approved`) are **skipped** for persistence: they do **not** increase `inserted` and are **not** counted as `duplicates`, because nothing is inserted for them and they are not failed duplicate-key writes.
+   - A batch that is **entirely** non-approved still returns **`200`** with `inserted: 0` and `duplicates: 0` (no insert statement runs).
+6. **Idempotency** as mentioned in point 2 above, I'll handle the Idempotency depending on the DB unique constraint plus transaction inserts by using `INSERT OR IGNORE` / `ON CONFLICT DO NOTHING` depends on our final database storage decision.
