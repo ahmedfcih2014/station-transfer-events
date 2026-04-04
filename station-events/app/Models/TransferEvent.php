@@ -13,6 +13,9 @@ class TransferEvent extends Model
     /** @use HasFactory<\Database\Factories\TransferEventFactory> */
     use HasFactory;
 
+    public $timestamps = false;
+    protected $primaryKey = 'event_id';
+
     protected $fillable = [
         'event_id',
         'station_id',
