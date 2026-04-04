@@ -7,6 +7,7 @@ It implements a small HTTP API that ingests **station transfer events** from an 
 
 - Use **PHP 8.3+**. From the `station-events` project directory, run `php artisan test`.
 - **Test vs runtime database:** `phpunit.xml` uses **in-memory SQLite** so CI and local runs need no Postgres instance. **Application defaults** target **PostgreSQL** (see `.env.example`). The ingest SQL uses PostgreSQL-style **`ON CONFLICT … RETURNING`**, which the SQLite version used in tests also accepts; if you point tests at another engine, confirm upsert support matches.
+- **Concurrent ingestion test:** `tests/Feature/ConcurrentIngestionTest.php` runs two workers via Laravel’s **Concurrency** process driver. Workers do not share `:memory:` SQLite, so that test switches to a **temporary file-backed SQLite** database for its duration only.
 
 ## Tech stack
 
