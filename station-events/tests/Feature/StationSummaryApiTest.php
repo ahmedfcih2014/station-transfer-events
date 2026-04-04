@@ -8,6 +8,16 @@ use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
+test('get summary for unknown station with no events returns zeros', function () {
+    getJson('/api/stations/unknown-station/summary')
+        ->assertStatus(200)
+        ->assertJson([
+            'station_id' => 'unknown-station',
+            'total_approved_amount' => 0,
+            'events_count' => 0,
+        ]);
+});
+
 test('get summary per station id', function () {
     // prepare data for seeding
     $stationId = 'Station-1';

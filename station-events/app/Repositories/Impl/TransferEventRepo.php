@@ -18,10 +18,11 @@ class TransferEventRepo implements ITransferEventRepo
             DB::raw('SUM(amount) as total'),
             DB::raw('COUNT(*) as count'),
         )->first();
+
         return StationSummaryDto::fromArray([
             'station_id' => $stationId,
-            'total' => $stationEvents->total,
-            'count' => $stationEvents->count,
+            'total' => (float) ($stationEvents?->total ?? 0),
+            'count' => (int) ($stationEvents?->count ?? 0),
         ]);
     }
 

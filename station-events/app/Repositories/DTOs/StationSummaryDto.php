@@ -10,15 +10,10 @@ class StationSummaryDto
 
     private function __construct(array $data)
     {
-        if (isset($data['station_id'])) {
-            $this->stationId = $data['station_id'];
-        }
-        if (isset($data['total'])) {
-            $this->totalApprovedAmount = $data['total'];
-        }
-        if (isset($data['count'])) {
-            $this->eventsCount = $data['count'];
-        }
+        // Use ?? not isset: SQL SUM(...) is NULL when there are no matching rows; isset(null) is false.
+        $this->stationId = $data['station_id'] ?? '';
+        $this->totalApprovedAmount = (float) ($data['total'] ?? 0.0);
+        $this->eventsCount = (int) ($data['count'] ?? 0);
     }
 
     public static function fromArray(array $data): self
