@@ -23,7 +23,7 @@ class TransferEventFactory extends Factory
             'station_id' => fake()->randomElement(['S1', 'S2', 'S3']),
             'amount' => fake()->randomFloat(2, 0, 1000),
             'status' => fake()->randomElement(TransferEventStatus::values()),
-            'batch_id' => fake()->numberBetween(1000000000, 9999999999),
+            'batch_id' => fake()->randomNumber(10),
             'created_at' => fake()->dateTime(),
         ];
     }
