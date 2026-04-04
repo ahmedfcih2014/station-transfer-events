@@ -1,11 +1,12 @@
 # station-transfer-events
 
-This repository to demonstrate a simple task as a hiring step.
+This repository demonstrates a small hiring-task API.
 It implements a small HTTP API that ingests **station transfer events** from an external system and exposes **per-station reconciliation**: totals sum only **approved** events, while ingestion stays **idempotent** on `event_id` and **safe under concurrent** duplicate or overlapping requests, backed by a swappable store (here, PostgreSQL with unique constraints and transactions).
 
 ## How to run tests
 
-- Locally, make sure you have php 8.3 at least installed on your machine and make sure your terminal is this path: /path-to-root/station-events then execute this command `php artisan test`
+- Use **PHP 8.3+**. From the `station-events` project directory, run `php artisan test`.
+- **Test vs runtime database:** `phpunit.xml` uses **in-memory SQLite** so CI and local runs need no Postgres instance. **Application defaults** target **PostgreSQL** (see `.env.example`). The ingest SQL uses PostgreSQL-style **`ON CONFLICT … RETURNING`**, which the SQLite version used in tests also accepts; if you point tests at another engine, confirm upsert support matches.
 
 ## Tech stack
 
@@ -81,7 +82,7 @@ curl -sS 'http://localhost:8000/api/stations/S1/summary'
    - Concurrent POSTs that reuse the same `event_id` must not insert a second row; **station summaries** must stay aligned with stored events.
    - We use a **unique constraint on `event_id`** and a **transactional bulk `INSERT`** with **`ON CONFLICT DO NOTHING`**: conflicts are handled **inside the database**—the existing row stays as-is, no duplicate row is written, and the request can still complete successfully (see point 5 for how **`duplicates`** is reported).
    - **Validation failures** (malformed payload, invalid fields) return **400** and run **no insert**—that is **fail-fast in the app layer before the database**. That is separate from idempotency: a **valid** batch may include `event_id`s already stored; those are not HTTP errors; they increment **`duplicates`** instead of **`inserted`**.
-3. Will use a database storage like `mysql`/`postgres` both support ACID both has a powerful features for scaling up the system.
+3. **Database choice:** MySQL and PostgreSQL both provide ACID transactions and are typical choices for scaling this kind of service. **This project defaults to PostgreSQL** (see `.env.example`). The repository uses PostgreSQL-compatible **`ON CONFLICT … DO NOTHING`** and **`RETURNING`**; swapping engines requires equivalent upsert behavior in the repository layer.
 4. **Summaries and what we persist:** the [GET summary rules](docs/assignment.md#rules-1) require `total_approved_amount` to sum **only** `approved` events.
    - For `events_count`, the brief allows either all stored rows per station or approved-only; **we count only stored rows**, and because we **persist only `approved` events**, `events_count` matches approved events for that station.
    - Ingest accepts other statuses for validation, but **non-approved events are not stored**—they do not affect totals or counts—so we never need to change a row’s status later.
@@ -91,4 +92,4 @@ curl -sS 'http://localhost:8000/api/stations/S1/summary'
    - **`duplicates`** — duplicate `event_id` values **among approved events in the same request**, plus approved `event_id`s that **already existed** in the store (idempotent replay).
    - **Non-approved** events (any status other than `approved`) are **skipped** for persistence: they do **not** increase `inserted` and are **not** counted as `duplicates`, because nothing is inserted for them and they are not failed duplicate-key writes.
    - A batch that is **entirely** non-approved still returns **`200`** with `inserted: 0` and `duplicates: 0` (no insert statement runs).
-6. **Idempotency** as mentioned in point 2 above, I'll handle the Idempotency depending on the DB unique constraint plus transaction inserts by using `INSERT OR IGNORE` / `ON CONFLICT DO NOTHING` depends on our final database storage decision.
+6. **Idempotency (mechanics):** Behavior is described in point 2. The implementation is a transactional **bulk insert** with **`ON CONFLICT (event_id) DO NOTHING`**, counting rows returned by **`RETURNING`**. Other databases express the same idea with different syntax (for example MySQL’s upsert variants); keep semantics aligned if you change the driver.
