@@ -1,0 +1,88 @@
+{
+  "info": {
+    "_postman_id": "2d1d6092-cee3-44fb-ad8f-28c574b9d8b7",
+    "name": "Station Transfer Events",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30212788"
+  },
+  "item": [
+    {
+      "name": "Store transfer events",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"events\": [\n        {\n            \"event_id\": \"EV-140\",\n            \"station_id\": \"ST-128\",\n            \"amount\": \"105.5\",\n            \"status\": \"3gmya\",\n            \"created_at\": \"2026-04-04T10:00:00Z\"\n        },\n        {\n            \"event_id\": \"EV-139\",\n            \"station_id\": \"ST-123\",\n            \"amount\": \"105.5\",\n            \"status\": \"approved\",\n            \"created_at\": \"2026-04-04T05:00:00+03:00\"\n        }\n    ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/transfers",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "transfers"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Station summary",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/stations/Station-1/summary",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "stations",
+            "Station-1",
+            "summary"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    }
+  ]
+}
