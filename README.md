@@ -19,14 +19,14 @@ It implements a small HTTP API that ingests **station transfer events** from an 
 
 Examples assume the HTTP server is at `http://localhost:8000` (adjust host and port to match how you run the app).
 
-### 1. Store transfers — `POST /transfers`
+### 1. Store transfers — `POST /api/transfers`
 
 Batch ingest of transfer events (idempotent by `event_id`; see [assignment](artifacts/assignment.md#accept-a-json-body)).
 
 **Request**
 
 ```bash
-curl -sS -X POST 'http://localhost:8000/transfers' \
+curl -sS -X POST 'http://localhost:8000/api/transfers' \
   -H 'Content-Type: application/json' \
   -d '{
     "events": [
@@ -52,12 +52,12 @@ curl -sS -X POST 'http://localhost:8000/transfers' \
 
 Invalid or failing validation → **`400`** with a helpful error ([error handling](artifacts/assignment.md#error-handling)).
 
-### 2. Summarize station transfers — `GET /stations/{station_id}/summary`
+### 2. Summarize station transfers — `GET /api/stations/{station_id}/summary`
 
 **Request**
 
 ```bash
-curl -sS 'http://localhost:8000/stations/S1/summary'
+curl -sS 'http://localhost:8000/api/stations/S1/summary'
 ```
 
 **Response** `200 OK` — [documented return shape](artifacts/assignment.md#return-1):
