@@ -13,7 +13,7 @@ It implements a small HTTP API that ingests **station transfer events** from an 
 
 ## API Examples
 
-Examples assume the HTTP server is at `http://localhost:8080` (adjust host and port to match how you run the app).
+Examples assume the HTTP server is at `http://localhost:8000` (adjust host and port to match how you run the app).
 
 ### 1. Store transfers — `POST /transfers`
 
@@ -22,7 +22,7 @@ Batch ingest of transfer events (idempotent by `event_id`; see [assignment](arti
 **Request**
 
 ```bash
-curl -sS -X POST 'http://localhost:8080/transfers' \
+curl -sS -X POST 'http://localhost:8000/transfers' \
   -H 'Content-Type: application/json' \
   -d '{
     "events": [
@@ -53,7 +53,7 @@ Invalid or failing validation → **`400`** with a helpful error ([error handlin
 **Request**
 
 ```bash
-curl -sS 'http://localhost:8080/stations/S1/summary'
+curl -sS 'http://localhost:8000/stations/S1/summary'
 ```
 
 **Response** `200 OK` — [documented return shape](artifacts/assignment.md#return-1):
