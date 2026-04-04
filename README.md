@@ -1,6 +1,7 @@
 # station-transfer-events
 
-This repository to demonstrate a simple task as a hiring step in PetroApp company
+This repository to demonstrate a simple task as a hiring step.
+It implements a small HTTP API that ingests **station transfer events** from an external system and exposes **per-station reconciliation**: totals sum only **approved** events, while ingestion stays **idempotent** on `event_id` and **safe under concurrent** duplicate or overlapping requests, backed by a swappable store (here, PostgreSQL with unique constraints and transactions).
 
 ## Tech stack
 
