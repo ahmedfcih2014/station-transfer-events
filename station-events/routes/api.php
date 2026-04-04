@@ -1,0 +1,10 @@
+<?php
+
+use App\Http\Controllers\TransferEventsController;
+use Illuminate\Support\Facades\Route;
+
+Route::controller(TransferEventsController::class)
+    ->group(function () {
+        Route::get('/stations/{stationId}/summary', 'stationSummary')->name('station.summary');
+        Route::post('/transfers', 'storeEvents')->name('transfers.store');
+    });

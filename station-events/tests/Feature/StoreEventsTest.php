@@ -8,7 +8,7 @@ use function PHPUnit\Framework\assertEquals;
 uses(RefreshDatabase::class);
 
 test('Store events, bad request validation', function () {
-    $response = postJson('/transfers', [
+    $response = postJson('/api/transfers', [
         'events' => [
             [
                 'event_id' => 123

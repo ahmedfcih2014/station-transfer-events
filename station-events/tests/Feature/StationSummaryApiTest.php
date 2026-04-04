@@ -32,7 +32,7 @@ test('get summary per station id', function () {
     ]));
 
     // assert the summary API is correct
-    getJson("/stations/{$stationId}/summary")
+    getJson("/api/stations/{$stationId}/summary")
         ->assertStatus(200)
         ->assertJson([
             'station_id' => $stationId,

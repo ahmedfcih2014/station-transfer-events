@@ -34,7 +34,7 @@ test('get summary per station id, out of order produce same totals', function ()
     ]));
 
     // assert the summary API is correct
-    getJson("/stations/{$stationId}/summary")
+    getJson("/api/stations/{$stationId}/summary")
         ->assertStatus(200)
         ->assertJson([
             'station_id' => $stationId,
