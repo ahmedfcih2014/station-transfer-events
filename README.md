@@ -3,12 +3,6 @@
 This repository demonstrates a small hiring-task API.
 It implements a small HTTP API that ingests **station transfer events** from an external system and exposes **per-station reconciliation**: totals sum only **approved** events, while ingestion stays **idempotent** on `event_id` and **safe under concurrent** duplicate or overlapping requests, backed by a swappable store (here, PostgreSQL with unique constraints and transactions).
 
-## How to run tests
-
-- Use **PHP 8.3+**. From the `station-events` project directory, run `php artisan test`.
-- **Test vs runtime database:** `phpunit.xml` uses **in-memory SQLite** so CI and local runs need no Postgres instance. **Application defaults** target **PostgreSQL** (see `.env.example`). The ingest SQL uses PostgreSQL-style **`ON CONFLICT … RETURNING`**, which the SQLite version used in tests also accepts; if you point tests at another engine, confirm upsert support matches.
-- **Concurrent ingestion test:** `tests/Feature/ConcurrentIngestionTest.php` runs two workers via Laravel’s **Concurrency** process driver. Workers do not share `:memory:` SQLite, so that test switches to a **temporary file-backed SQLite** database for its duration only.
-
 ## Tech stack
 
 - **Laravel (PHP)** for the HTTP API—built-in validation, routing, and testing fit the assignment’s JSON contract, with more framework overhead than a minimal script.
@@ -16,6 +10,30 @@ It implements a small HTTP API that ingests **station transfer events** from an 
 - **Nginx + PHP-FPM** matches a typical deploy layout; for local development, `php artisan serve` is enough with less setup at the cost of parity with prod.
 
 ## [Requirements](docs/assignment.md)
+
+## How to run project locally
+
+The Laravel app lives in **`station-events/`** (not the repo root).
+
+1. Install **PHP 8.3+**, **Composer**, and **PostgreSQL**. Enable PHP’s **PostgreSQL PDO** extension (`pdo_pgsql`—on macOS with Homebrew PHP, it is usually built in; otherwise install/enable it so Laravel can connect).
+2. Clone this repository.
+3. `cd station-events` and run `composer install`.
+4. Start PostgreSQL.
+5. Create an empty database (the default in `.env.example` is `station_events`; use that name or change `DB_DATABASE` in `.env` to match what you created).
+6. Run `cp .env.example .env`.
+7. Edit `.env` and set the database credentials (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
+8. Run `php artisan key:generate`.
+9. Run `php artisan migrate`.
+10. Run `php artisan serve` (default URL `http://127.0.0.1:8000`).
+11. Try the [curl examples](#api-examples) below. You do **not** need Node/npm for the HTTP API alone; they are only used if you work on the bundled front-end assets.
+
+Redis and a queue worker are **not** required for local API use (`.env.example` uses the database for cache, sessions, and queues, and migrations create those tables).
+
+## How to run tests
+
+- Use **PHP 8.3+**. From the `station-events` project directory, run `php artisan test`.
+- **Test vs runtime database:** `phpunit.xml` uses **in-memory SQLite** so CI and local runs need no Postgres instance. **Application defaults** target **PostgreSQL** (see `.env.example`). The ingest SQL uses PostgreSQL-style **`ON CONFLICT … RETURNING`**, which the SQLite version used in tests also accepts; if you point tests at another engine, confirm upsert support matches.
+- **Concurrent ingestion test:** `tests/Feature/ConcurrentIngestionTest.php` runs two workers via Laravel’s **Concurrency** process driver. Workers do not share `:memory:` SQLite, so that test switches to a **temporary file-backed SQLite** database for its duration only.
 
 ## API Examples
 
@@ -54,12 +72,12 @@ curl -sS -X POST 'http://localhost:8000/transfers' \
 
 Invalid or failing validation → **`400`** with a helpful error ([error handling](docs/assignment.md#error-handling)).
 
-### 2. Summarize station transfers — `GET /stations/{station_id}/summary`
+### 2. Summarize station transfers — `GET /api/stations/{station_id}/summary`
 
 **Request**
 
 ```bash
-curl -sS 'http://localhost:8000/stations/S1/summary'
+curl -sS 'http://localhost:8000/api/stations/S1/summary'
 ```
 
 **Response** `200 OK` — [documented return shape](docs/assignment.md#return-1):
