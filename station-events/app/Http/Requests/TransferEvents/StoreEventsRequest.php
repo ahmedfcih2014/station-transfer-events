@@ -3,6 +3,7 @@
 namespace App\Http\Requests\TransferEvents;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Rules\Iso8601DateTime;
 
 class StoreEventsRequest extends BaseFormRequest
 {
@@ -26,8 +27,9 @@ class StoreEventsRequest extends BaseFormRequest
             'events.*.event_id' => 'required|string|max:255',
             'events.*.station_id' => 'required|string|max:255',
             'events.*.amount' => 'required|numeric|min:0',
-            'events.*.status' => 'required|string|max:255',
-            'events.*.created_at' => 'required|date',
+            // hint: according to design notes at readme we'll process only approved events
+            'events.*.status' => 'required|string|max:255|in:approved',
+            'events.*.created_at' => ['required', 'string', new Iso8601DateTime()],
         ];
     }
 
