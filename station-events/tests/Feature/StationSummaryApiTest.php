@@ -9,7 +9,7 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 test('get summary for unknown station with no events returns zeros', function () {
-    getJson('/api/stations/unknown-station/summary')
+    getJson('/stations/unknown-station/summary')
         ->assertStatus(200)
         ->assertJson([
             'station_id' => 'unknown-station',
@@ -42,7 +42,7 @@ test('get summary per station id', function () {
     ]));
 
     // assert the summary API is correct
-    getJson("/api/stations/{$stationId}/summary")
+    getJson("/stations/{$stationId}/summary")
         ->assertStatus(200)
         ->assertJson([
             'station_id' => $stationId,
