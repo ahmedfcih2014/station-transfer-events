@@ -11,9 +11,26 @@ It implements a small HTTP API that ingests **station transfer events** from an 
 
 ## [Requirements](docs/assignment.md)
 
+## Quick start
+
+From the **repository root** after cloning:
+
+|                                                                  |                           |
+| ---------------------------------------------------------------- | ------------------------- |
+| **Docker** (Nginx + PHP-FPM + PostgreSQL; no local PHP/Postgres) | `./scripts/run-docker.sh` |
+| **Local** (PHP + Composer + PostgreSQL on your machine)          | `./scripts/run-local.sh`  |
+
+The scripts are marked executable in git. If your system does not preserve that, run `chmod +x scripts/run-docker.sh scripts/run-local.sh` once.
+
+Default URLs: **Docker** `http://localhost:8080` (override with `HTTP_PORT`, e.g. `HTTP_PORT=3000 ./scripts/run-docker.sh`). **Local** `http://127.0.0.1:8000`.
+
+Then try the [API examples](#api-examples).
+
 ## How to run project locally
 
-The Laravel app lives in **`station-events/`** (not the repo root).
+The Laravel app lives in **`station-events/`** (not the repo root). **`./scripts/run-local.sh`** (from the repo root) runs `composer install`, ensures `.env` / `APP_KEY`, migrates, and starts `php artisan serve`.
+
+Manual equivalent:
 
 1. Install **PHP 8.3+**, **Composer**, and **PostgreSQL**. Enable PHP’s **PostgreSQL PDO** extension (`pdo_pgsql`—on macOS with Homebrew PHP, it is usually built in; otherwise install/enable it so Laravel can connect).
 2. Clone this repository.
@@ -33,7 +50,9 @@ Redis and a queue worker are **not** required for local API use (`.env.example` 
 
 The repo root contains **`docker-compose.yml`**: **Nginx**, **PHP-FPM** (Laravel in `station-events/`), and **PostgreSQL**. You need **Docker** and **Docker Compose**.
 
-From the **repository root** (not `station-events/`):
+**`./scripts/run-docker.sh`** (from the repo root) runs `docker compose up -d --build`, applies migrations, and prints the base URL.
+
+Manual equivalent from the **repository root** (not `station-events/`):
 
 1. `docker compose up -d --build`
 2. `docker compose exec app php artisan migrate --force`
