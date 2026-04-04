@@ -29,11 +29,49 @@ The Laravel app lives in **`station-events/`** (not the repo root).
 
 Redis and a queue worker are **not** required for local API use (`.env.example` uses the database for cache, sessions, and queues, and migrations create those tables).
 
+## How to run with Docker
+
+The repo root contains **`docker-compose.yml`**: **Nginx**, **PHP-FPM** (Laravel in `station-events/`), and **PostgreSQL**. You need **Docker** and **Docker Compose**.
+
+From the **repository root** (not `station-events/`):
+
+1. `docker compose up -d --build`
+2. `docker compose exec app php artisan migrate --force`
+3. Open the API at **`http://localhost:8080`** (Nginx maps host port **`8080`** to the app by default).
+
+Compose sets `DB_HOST=postgres` and database credentials for you. To use another host port, set **`HTTP_PORT`** (for example `HTTP_PORT=3000 docker compose up -d`). You can override `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `APP_URL`, and related variables the same way; keep app and Postgres values in sync.
+
+To stop containers: `docker compose down`. To remove the Postgres data volume as well: `docker compose down -v`.
+
+The HTTP API paths match the Laravel app (there is **no** `/api` prefix—see `bootstrap/app.php`). Example: `GET http://localhost:8080/stations/S1/summary` and `POST http://localhost:8080/transfers`.
+
+The app image is built with **PHP 8.4** to match the current `composer.lock`. The `app` service bind-mounts `./station-events`; on first run, if `vendor/` is missing, the container installs Composer dependencies (including a usable autoloader for the API).
+
 ## How to run tests
 
-- Use **PHP 8.3+**. From the `station-events` project directory, run `php artisan test`.
+- Use **PHP 8.3+** (or run tests **in Docker**—see below). From the `station-events` project directory, run `php artisan test`.
 - **Test vs runtime database:** `phpunit.xml` uses **in-memory SQLite** so CI and local runs need no Postgres instance. **Application defaults** target **PostgreSQL** (see `.env.example`). The ingest SQL uses PostgreSQL-style **`ON CONFLICT … RETURNING`**, which the SQLite version used in tests also accepts; if you point tests at another engine, confirm upsert support matches.
 - **Concurrent ingestion test:** `tests/Feature/ConcurrentIngestionTest.php` runs two workers via Laravel’s **Concurrency** process driver. Workers do not share `:memory:` SQLite, so that test switches to a **temporary file-backed SQLite** database for its duration only.
+
+### Running tests in Docker
+
+From the **repository root**, with the **`app`** container running after `docker compose up -d`:
+
+```bash
+docker compose exec app php artisan test
+```
+
+Tests still use **`phpunit.xml`** (SQLite in memory); you do **not** need Postgres for the test suite itself.
+
+To run tests **without** starting Postgres or Nginx (only the `app` image and bind mount):
+
+```bash
+docker compose run --rm --no-deps app php artisan test
+```
+
+**Dev dependencies (Pest, PHPUnit, and so on):** the production-oriented Docker **build** runs `composer install --no-dev`. After `docker compose up`, your bind-mounted `station-events` directory is what the container sees. If `vendor/` is empty, the entrypoint runs a full `composer install` (including dev). If you already have a `vendor/` tree produced with **`composer install --no-dev`** on the host, run **`docker compose exec app composer install`** once so test tooling is present before `php artisan test`.
+
+**Compose `DB_*` vs tests:** `docker-compose.yml` exports PostgreSQL settings into the container. `phpunit.xml` forces SQLite for the test run (`force="true"` on the relevant `<env>` entries) and mirrors the database settings into `<server>` so subprocess env (used by Laravel’s **Concurrency** workers) still sees `DB_CONNECTION=sqlite`. Without that, workers could ignore PHPUnit’s SQLite config and try Postgres using a temp file path as the database name.
 
 ## API Examples
 
