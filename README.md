@@ -3,6 +3,10 @@
 This repository to demonstrate a simple task as a hiring step.
 It implements a small HTTP API that ingests **station transfer events** from an external system and exposes **per-station reconciliation**: totals sum only **approved** events, while ingestion stays **idempotent** on `event_id` and **safe under concurrent** duplicate or overlapping requests, backed by a swappable store (here, PostgreSQL with unique constraints and transactions).
 
+## How to run tests
+
+- Locally, make sure you have php 8.3 at least installed on your machine and make sure your terminal is this path: /path-to-root/station-events then execute this command `php artisan test`
+
 ## Tech stack
 
 - **Laravel (PHP)** for the HTTP API—built-in validation, routing, and testing fit the assignment’s JSON contract, with more framework overhead than a minimal script.
