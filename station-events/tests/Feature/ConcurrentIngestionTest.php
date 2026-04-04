@@ -13,11 +13,15 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Subprocess-based concurrency (Laravel Concurrency process driver) does not share
- * SQLite :memory: with the parent; use a temp file so both workers hit one store.
+ * Repository-level concurrent inserts via Laravel Concurrency (process driver).
  *
- * Implemented as a PHPUnit TestCase (not Pest) so serialized closures are not bound
- * to Pest's generated test class, which breaks invoke-serialized-closure workers.
+ * PHPUnit (not Pest): serialized closures must not be bound to Pest’s generated test class,
+ * or invoke-serialized-closure workers fail to load that class.
+ *
+ * Database: same rationale as ConcurrentStoreEventsTest — we skip RefreshDatabase + :memory: for
+ * this test body. Worker processes do not share the parent’s in-memory SQLite; a temp file path
+ * gives one shared database for the parent and all workers. migrate:fresh + finally restore keeps
+ * the rest of the suite on phpunit’s default :memory: configuration.
  */
 class ConcurrentIngestionTest extends TestCase
 {
