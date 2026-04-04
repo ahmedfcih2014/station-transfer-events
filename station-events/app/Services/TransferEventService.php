@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\TransferEventStatus;
 use App\Http\Requests\TransferEvents\StoreEventsRequest;
 use App\Repositories\DTOs\TransferEventDto;
 use App\Repositories\ITransferEventRepo;
@@ -33,6 +34,11 @@ class TransferEventService
         $duplicatesInRequest = 0;
 
         foreach ($request->validated('events') ?? [] as $event) {
+            // skip non approved events
+            if ($event['status'] !== TransferEventStatus::APPROVED->value) {
+                continue;
+            }
+
             if (!isset($eventIds[$event['event_id']])) {
                 $eventIds[$event['event_id']] = true;
                 $uniqueEventsData->push(TransferEventDto::fromArray($event, $batchId));
