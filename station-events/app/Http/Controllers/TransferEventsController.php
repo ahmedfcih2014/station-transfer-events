@@ -16,5 +16,9 @@ class TransferEventsController extends Controller
         return $this->successResponse($summary);
     }
 
-    public function storeEvents(StoreEventsRequest $request): JsonResponse {}
+    public function storeEvents(StoreEventsRequest $request): JsonResponse
+    {
+        $dto = $this->transferEventService->storeEvents($request);
+        return $this->successResponse($dto->toArray());
+    }
 }
