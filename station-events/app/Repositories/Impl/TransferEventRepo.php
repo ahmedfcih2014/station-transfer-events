@@ -30,6 +30,10 @@ class TransferEventRepo implements ITransferEventRepo
         $values = collect([]);
         $events->each(fn(TransferEventDto $e)  => $values->push($e->toInsertValues()));
 
+        if ($values->isEmpty()) {
+            return 0;
+        }
+
         $placeholders = Str::of('(?, ?, ?, ?, ?, ?), ')->repeat($values->count())->toString();
         $placeholders = rtrim($placeholders, ', ');
 
