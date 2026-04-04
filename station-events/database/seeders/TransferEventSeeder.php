@@ -17,7 +17,6 @@ class TransferEventSeeder extends Seeder
             $randomBatchId = now()->timestamp . $i;
             TransferEvent::factory(5)->create([
                 'batch_id' => $randomBatchId,
-                'station_id' => "Station-{$i}",
             ]);
         }
     }

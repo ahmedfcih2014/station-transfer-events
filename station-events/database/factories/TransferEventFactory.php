@@ -20,9 +20,9 @@ class TransferEventFactory extends Factory
     {
         return [
             'event_id' => fake()->uuid(),
-            'station_id' => fake()->randomElement(['S1', 'S2', 'S3']),
+            'station_id' => fake()->randomElement(['Station-1', 'Station-2', 'Station-3']),
             'amount' => fake()->randomFloat(2, 0, 1000),
-            'status' => fake()->randomElement(TransferEventStatus::values()),
+            'status' => TransferEventStatus::APPROVED->value,
             'batch_id' => fake()->numberBetween(1000000000, 9999999999),
             'created_at' => fake()->dateTime(),
         ];

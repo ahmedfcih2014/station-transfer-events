@@ -11,13 +11,4 @@ enum TransferEventStatus: string
     case APPROVED = 'approved';
     case PENDING = 'pending';
     case CANCELLED = 'cancelled';
-
-    public static function values(): array
-    {
-        return [
-            self::APPROVED->value,
-            self::PENDING->value,
-            self::CANCELLED->value,
-        ];
-    }
 }
